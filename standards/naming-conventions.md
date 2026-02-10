@@ -36,11 +36,11 @@ This standard applies to:
 
 ## 4. Description and Help Text Requirements
 
-Every custom object, field, and metadata element **must** include a Description and (where applicable) Help Text. These are not optional — they are a required part of every metadata deployment.
+Every custom object, field, automation, and metadata element **must** include a Description and (where applicable) Help Text. These are not optional — they are a required part of every metadata deployment.
 
-### 4.1 Description (Required on All Custom Metadata)
+### 4.1 Description (Required on All Custom Metadata and Automations)
 
-The Description should explain **what the value contributes to a larger process** — not just restate the field name.
+The Description should explain **what the value contributes to a larger process** — not just restate the element name. This applies equally to data elements (objects, fields) and automations (flows, validation rules, Apex triggers, scheduled jobs).
 
 | Principle | Guidance |
 |-----------|----------|
@@ -57,6 +57,17 @@ The Description should explain **what the value contributes to a larger process*
 | `Status__c` | "Status of the record" | "Drives the approval workflow and determines which automation rules (validation, assignment, escalation) apply to this case" |
 | `Customer_Order__c` | "Custom object for orders" | "Represents a customer purchase order that flows through the fulfillment pipeline from creation through shipping confirmation" |
 | `SAP_Id__c` | "SAP ID" | "External identifier from SAP ERP used by the nightly integration to match and reconcile account records across systems" |
+
+**Automation Examples:**
+
+| Automation | Bad Description | Good Description |
+|------------|----------------|-----------------|
+| `Account_Update_Billing_RTF` | "Updates billing on account" | "Triggered on Account billing address change. Propagates updated address to all open Orders and active Subscriptions, then notifies the finance team via email alert." |
+| `Case_Escalation_AF` | "Escalates cases" | "Invoked by the Case Escalation scheduled job when a case exceeds its SLA response time. Reassigns to the manager queue, sets priority to Urgent, and creates a Chatter notification for the service director." |
+| `Daily_Report_Generation_SCH` | "Scheduled report flow" | "Runs daily at 6 AM UTC. Aggregates prior-day case metrics (volume, resolution time, CSAT) and posts a summary to the #service-ops Slack channel via the Slack integration." |
+| `AccountTrigger` | "Trigger on Account" | "Single trigger entry point for all Account DML events. Delegates to AccountTriggerHandler which enforces territory assignment, billing sync validation, and partner scorecard recalculation." |
+| `Account_Phone_Required_When_Active` | "Phone required" | "Ensures active accounts always have a contact phone number, which is required by the outbound dialer integration and the nightly lead routing process." |
+| `AccountCleanupBatch` | "Cleans up accounts" | "Weekly batch job that identifies accounts with no activity in 18+ months, flags them as Inactive, removes them from territory assignment, and generates a review list for the sales ops team." |
 
 ### 4.2 Help Text (Required on All Custom Fields)
 
@@ -82,6 +93,7 @@ Help Text should explain **how the value should be used or populated** — it is
 
 | Metadata Type | Description Required | Help Text Required |
 |---------------|---------------------|--------------------|
+| **Data Elements** | | |
 | Custom Object | Yes | N/A |
 | Custom Field | Yes | Yes |
 | Custom Metadata Type | Yes | N/A |
@@ -89,7 +101,14 @@ Help Text should explain **how the value should be used or populated** — it is
 | Custom Setting Field | Yes | Yes |
 | Custom Metadata Field | Yes | Yes |
 | Picklist Value | Yes (via description) | N/A |
+| **Automations** | | |
+| Flow (all types) | Yes (in Flow Description field) | N/A |
 | Validation Rule | Yes (error message serves as user guidance) | N/A |
+| Apex Trigger | Yes (in class-level comment block) | N/A |
+| Apex Batch/Schedulable | Yes (in class-level comment block) | N/A |
+| Approval Process | Yes (in process description) | N/A |
+| Email Alert / Template | Yes (in description field) | N/A |
+| Platform Event | Yes | N/A |
 
 ### 4.4 Description and Help Text Anti-Patterns
 
@@ -693,6 +712,7 @@ Before code review or deployment:
 - [ ] All custom fields have appropriate type suffixes
 - [ ] Boolean fields use Is_ or Has_ prefix
 - [ ] **All custom objects and fields have a Description that explains their role in the larger process**
+- [ ] **All automations (Flows, triggers, batch jobs, validation rules, approval processes) have a Description**
 - [ ] **All custom fields have Help Text that explains how to use or populate the value**
 - [ ] **Descriptions are not label restatements — they provide genuine business context**
 - [ ] **Help Text is user-facing, actionable, and specifies format/source where applicable**
