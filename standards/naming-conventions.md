@@ -34,9 +34,78 @@ This standard applies to:
 | English Only | Use English for all API names |
 | No Special Characters | Avoid underscores in middle of words (except API name suffixes) |
 
-## 4. Custom Objects
+## 4. Description and Help Text Requirements
 
-### 4.1 API Name Convention
+Every custom object, field, and metadata element **must** include a Description and (where applicable) Help Text. These are not optional — they are a required part of every metadata deployment.
+
+### 4.1 Description (Required on All Custom Metadata)
+
+The Description should explain **what the value contributes to a larger process** — not just restate the field name.
+
+| Principle | Guidance |
+|-----------|----------|
+| Purpose-driven | Explain the business process or workflow this element supports |
+| Context | Describe how this element fits into the broader data model or automation |
+| Not a label restatement | Never just reword the API name — add genuine context |
+
+**Examples:**
+
+| Element | Bad Description | Good Description |
+|---------|----------------|-----------------|
+| `Is_Active__c` | "Whether the record is active" | "Controls whether this account is included in the nightly sync to the billing system and appears in active account reports" |
+| `Total_Amount__c` | "The total amount" | "Aggregated line item total used by the invoice generation process to calculate final billing amounts" |
+| `Status__c` | "Status of the record" | "Drives the approval workflow and determines which automation rules (validation, assignment, escalation) apply to this case" |
+| `Customer_Order__c` | "Custom object for orders" | "Represents a customer purchase order that flows through the fulfillment pipeline from creation through shipping confirmation" |
+| `SAP_Id__c` | "SAP ID" | "External identifier from SAP ERP used by the nightly integration to match and reconcile account records across systems" |
+
+### 4.2 Help Text (Required on All Custom Fields)
+
+Help Text should explain **how the value should be used or populated** — it is the field-level guidance that appears to end users when they hover over the info icon.
+
+| Principle | Guidance |
+|-----------|----------|
+| User-facing | Write for the person filling in the field, not the developer |
+| Actionable | Tell the user what to enter, where to find the value, or what format to use |
+| Boundary-setting | Clarify valid values, expected formats, or selection criteria |
+
+**Examples:**
+
+| Field | Bad Help Text | Good Help Text |
+|-------|--------------|----------------|
+| `Is_Active__c` | "Check if active" | "Check this box if the account has an active contract. Unchecking will remove the account from billing sync and active reports." |
+| `Total_Amount__c` | "Enter total" | "Auto-calculated from line items. If you need to override, enter the agreed contract total in USD. This value drives invoice generation." |
+| `Status__c` | "Select a status" | "Select the current case status. Moving to 'Escalated' triggers manager notification. Moving to 'Closed' requires a resolution summary." |
+| `SAP_Id__c` | "Enter SAP ID" | "Enter the 10-digit SAP customer number from the ERP system. Found in SAP transaction BP under 'Business Partner Number'. Leave blank for non-SAP accounts." |
+| `Start_Date__c` | "Enter start date" | "Enter the contract effective date. Must be a future date for new contracts. For renewals, use the day after the previous contract end date." |
+
+### 4.3 Where Each Applies
+
+| Metadata Type | Description Required | Help Text Required |
+|---------------|---------------------|--------------------|
+| Custom Object | Yes | N/A |
+| Custom Field | Yes | Yes |
+| Custom Metadata Type | Yes | N/A |
+| Custom Setting | Yes | N/A |
+| Custom Setting Field | Yes | Yes |
+| Custom Metadata Field | Yes | Yes |
+| Picklist Value | Yes (via description) | N/A |
+| Validation Rule | Yes (error message serves as user guidance) | N/A |
+
+### 4.4 Description and Help Text Anti-Patterns
+
+| Anti-Pattern | Why It Fails | Fix |
+|--------------|-------------|-----|
+| Restating the label | "Account Name field" adds zero value | Explain the business role |
+| Generic instructions | "Enter a value" | Specify what value, format, and source |
+| Developer jargon | "FK to Account object" | Write for business users |
+| Empty/blank | Provides no guidance | Always fill in — no exceptions |
+| Copy-pasted | Same text on every field | Tailor to each field's specific role |
+
+---
+
+## 5. Custom Objects
+
+### 5.1 API Name Convention
 
 ```
 Format: [BusinessEntity]__c
@@ -52,7 +121,7 @@ Examples:
 ✗ CUSTOMER_ORDER__c (all caps)
 ```
 
-### 4.2 Label Convention
+### 5.2 Label Convention
 
 ```
 Format: [Business Entity Name]
@@ -64,7 +133,7 @@ Examples:
 ✓ "Service Request"
 ```
 
-### 4.3 Plural Label
+### 5.3 Plural Label
 
 ```
 Format: [Business Entity Name]s or irregular plural
@@ -76,7 +145,7 @@ Examples:
 ✓ "Service Requests"
 ```
 
-### 4.4 Junction Objects
+### 5.4 Junction Objects
 
 ```
 Format: [Parent1]_[Parent2]__c
@@ -88,7 +157,7 @@ Examples:
 ✓ Order_Product__c
 ```
 
-### 4.5 Custom Settings and Custom Metadata Types
+### 5.5 Custom Settings and Custom Metadata Types
 
 **Custom Settings (Hierarchy):**
 ```
@@ -129,9 +198,9 @@ Examples:
 > See [STD-002: Configuration Management](./configuration-management.md) for CMT vs Custom Settings decisions.
 > See [STD-004: Automation Bypass](./automation-bypass.md) for bypass settings structure.
 
-## 5. Custom Fields
+## 6. Custom Fields
 
-### 5.1 Standard Field Types
+### 6.1 Standard Field Types
 
 | Field Type | Suffix | Example |
 |------------|--------|---------|
@@ -148,7 +217,7 @@ Examples:
 | Roll-Up Summary | (none) or `_Rollup` | `Total_Line_Items__c` |
 | Percent | `_Percent` or `_Pct` | `Discount_Percent__c` |
 
-### 5.2 Boolean/Checkbox Fields
+### 6.2 Boolean/Checkbox Fields
 
 ```
 Format: Is_[State]__c or Has_[Entity]__c
@@ -164,7 +233,7 @@ Examples:
 ✗ Primary_Flag__c (redundant)
 ```
 
-### 5.3 Relationship Fields
+### 6.3 Relationship Fields
 
 ```
 Lookup Format: [Related_Object]__c or [Relationship_Description]__c
@@ -177,7 +246,7 @@ Examples:
 ✓ Parent_Case__c (self-lookup)
 ```
 
-### 5.4 Formula Fields
+### 6.4 Formula Fields
 
 ```
 Format: [Descriptive_Name]__c
@@ -189,7 +258,7 @@ Examples:
 ✓ Is_Overdue__c (boolean formula)
 ```
 
-### 5.5 External ID Fields
+### 6.5 External ID Fields
 
 ```
 Format: [Source_System]_Id__c or External_Id__c
@@ -215,9 +284,9 @@ Examples:
 > See [STD-003: Data Migration](./data-migration.md) Section 4.2 for External ID strategy.
 > See [STD-008: Integration Patterns](./integration-patterns.md) for integration-specific guidance.
 
-## 6. Apex Classes
+## 7. Apex Classes
 
-### 6.1 Class Types and Suffixes
+### 7.1 Class Types and Suffixes
 
 | Class Type | Suffix | Example |
 |------------|--------|---------|
@@ -239,7 +308,7 @@ Examples:
 | Interface | `I` prefix or `able` suffix | `IAccountService` or `Loggable` |
 | Abstract | `Abstract` prefix or `Base` suffix | `AbstractTriggerHandler` |
 
-### 6.2 Class Naming Pattern
+### 7.2 Class Naming Pattern
 
 ```
 Format: [Entity/Feature][Type]
@@ -257,7 +326,7 @@ Examples:
 ✗ AcctTrigHandler (abbreviations)
 ```
 
-### 6.3 Method Naming
+### 7.3 Method Naming
 
 ```
 Format: verbNoun or verb
@@ -286,7 +355,7 @@ Examples:
 ✗ GETACCOUNT() (all caps)
 ```
 
-### 6.4 Variable Naming
+### 7.4 Variable Naming
 
 ```
 Format: descriptiveName
@@ -306,7 +375,7 @@ Map/Collection Naming:
 ✓ pendingOrders (List<Order__c>)
 ```
 
-### 6.5 Constant Naming
+### 7.5 Constant Naming
 
 ```
 Format: UPPER_SNAKE_CASE
@@ -318,9 +387,9 @@ Examples:
 ✓ public static final String API_VERSION = 'v1';
 ```
 
-## 7. Apex Triggers
+## 8. Apex Triggers
 
-### 7.1 Trigger Naming
+### 8.1 Trigger Naming
 
 ```
 Format: [ObjectName]Trigger
@@ -336,7 +405,7 @@ Examples:
 ✗ triggerAccount (wrong order)
 ```
 
-### 7.2 Trigger Structure
+### 8.2 Trigger Structure
 
 ```apex
 trigger AccountTrigger on Account (
@@ -350,9 +419,9 @@ trigger AccountTrigger on Account (
 }
 ```
 
-## 8. Flows
+## 9. Flows
 
-### 8.1 Flow Naming Convention
+### 9.1 Flow Naming Convention
 
 ```
 Format: [Object/Process]_[Action]_[Type]
@@ -378,7 +447,7 @@ Examples:
 ✗ AccountFlow (missing action/type)
 ```
 
-### 8.2 Flow Element Naming
+### 9.2 Flow Element Naming
 
 | Element Type | Prefix | Example |
 |--------------|--------|---------|
@@ -393,7 +462,7 @@ Examples:
 | Action | Action_ | Action_Send_Email |
 | Subflow | Subflow_ | Subflow_Validate_Address |
 
-### 8.3 Flow Variable Naming
+### 9.3 Flow Variable Naming
 
 ```
 Format: var[Type][Description]
@@ -408,9 +477,9 @@ Examples:
 ✓ varDateStartDate (date)
 ```
 
-## 9. Lightning Web Components
+## 10. Lightning Web Components
 
-### 9.1 Component Naming
+### 10.1 Component Naming
 
 ```
 Format: camelCase (folder and files)
@@ -428,7 +497,7 @@ Examples:
 ✗ acctLst (abbreviations)
 ```
 
-### 9.2 LWC File Structure
+### 10.2 LWC File Structure
 
 ```
 componentName/
@@ -440,7 +509,7 @@ componentName/
     └── componentName.test.js
 ```
 
-### 9.3 JavaScript Naming
+### 10.3 JavaScript Naming
 
 ```javascript
 // Properties (camelCase)
@@ -464,9 +533,9 @@ const DEFAULT_PAGE_SIZE = 10;
 this.dispatchEvent(new CustomEvent('record-selected'));
 ```
 
-## 10. Aura Components (Legacy)
+## 11. Aura Components (Legacy)
 
-### 10.1 Component Naming
+### 11.1 Component Naming
 
 ```
 Format: PascalCase
@@ -478,7 +547,7 @@ Examples:
 ✓ CustomLookup
 ```
 
-### 10.2 Aura Bundle Structure
+### 11.2 Aura Bundle Structure
 
 ```
 ComponentName/
@@ -491,9 +560,9 @@ ComponentName/
 └── ComponentName.svg
 ```
 
-## 11. Validation Rules
+## 12. Validation Rules
 
-### 11.1 Naming Convention
+### 12.1 Naming Convention
 
 ```
 Format: [Object]_[Field/Logic]_[Validation]
@@ -509,9 +578,9 @@ Examples:
 ✗ Check_Email (too vague)
 ```
 
-## 12. Permission Sets
+## 13. Permission Sets
 
-### 12.1 Naming Convention
+### 13.1 Naming Convention
 
 ```
 Format: [App/Module]_[Access Level]
@@ -528,9 +597,9 @@ Examples:
 ✗ John_Permission_Set (user-specific)
 ```
 
-## 13. Custom Labels
+## 14. Custom Labels
 
-### 13.1 Naming Convention
+### 14.1 Naming Convention
 
 ```
 Format: [Category]_[Context]_[Description]
@@ -544,9 +613,9 @@ Examples:
 ✓ Help_Text_Opportunity_Stage
 ```
 
-## 14. Reports and Dashboards
+## 15. Reports and Dashboards
 
-### 14.1 Report Naming
+### 15.1 Report Naming
 
 ```
 Format: [Object/Subject] - [Metric/View] [(Owner/Team)]
@@ -559,7 +628,7 @@ Examples:
 ✓ Leads - Conversion Rate by Source
 ```
 
-### 14.2 Dashboard Naming
+### 15.2 Dashboard Naming
 
 ```
 Format: [Audience] - [Subject] Dashboard
@@ -571,7 +640,7 @@ Examples:
 ✓ Service Manager - Case Metrics Dashboard
 ```
 
-### 14.3 Report Folders
+### 15.3 Report Folders
 
 ```
 Format: [Department/Function] Reports
@@ -584,7 +653,7 @@ Examples:
 ✓ Operations Reports
 ```
 
-## 15. Quick Reference Table
+## 16. Quick Reference Table
 
 | Element | Convention | Example |
 |---------|------------|---------|
@@ -603,7 +672,7 @@ Examples:
 | Permission Set | App_Level | `Sales_Cloud_Admin` |
 | Custom Label | Category_Context_Desc | `Error_Required_Field` |
 
-## 16. Anti-Patterns to Avoid
+## 17. Anti-Patterns to Avoid
 
 | Anti-Pattern | Issue | Correct Approach |
 |--------------|-------|------------------|
@@ -616,13 +685,17 @@ Examples:
 | `doStuff()`, `handleIt()` | Vague verbs | Specific actions |
 | `flag`, `status`, `type` | Ambiguous alone | Add context |
 
-## 17. Compliance Checklist
+## 18. Compliance Checklist
 
 Before code review or deployment:
 
 - [ ] All custom objects follow PascalCase__c pattern
 - [ ] All custom fields have appropriate type suffixes
 - [ ] Boolean fields use Is_ or Has_ prefix
+- [ ] **All custom objects and fields have a Description that explains their role in the larger process**
+- [ ] **All custom fields have Help Text that explains how to use or populate the value**
+- [ ] **Descriptions are not label restatements — they provide genuine business context**
+- [ ] **Help Text is user-facing, actionable, and specifies format/source where applicable**
 - [ ] Apex classes have appropriate type suffixes
 - [ ] One trigger per object with Handler pattern
 - [ ] Flows include type suffix (RTF, SF, AF, etc.)
