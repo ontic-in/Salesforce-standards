@@ -177,7 +177,10 @@ For upserts and relationship mapping, establish external IDs:
 
 **External ID Field Requirements:**
 - Must be marked as External ID in field definition
-- Should be unique (recommend "Unique" checkbox)
+- Fields storing foreign keys from external systems **MUST** be created as External IDs (see [STD-005: Naming Conventions](./naming-conventions.md) Section 6.5)
+- Set as **Unique** when the field represents a 1:1 key link between systems (default recommendation)
+- Leave **non-unique** when logical duplicates exist (e.g., shared parent IDs across child records) — document the reasoning in the field description
+- Always confirm uniqueness requirements during the design phase
 - Case-sensitive option available
 
 ### 4.3 Data Transformation Rules

@@ -296,9 +296,19 @@ Examples:
 
 **External ID Field Requirements:**
 - Mark as "External ID" in field settings
-- Recommend enabling "Unique" checkbox
 - Use Text data type (not Number) for flexibility
 - Document source system in field description
+
+**Foreign Key Standard:** When a field is created to store a foreign key from an external system (e.g., an ERP customer ID, a billing platform subscription ID), it **MUST** be created as an External ID in Salesforce. This enables upsert operations and ensures the field is indexed for efficient cross-system lookups.
+
+**Uniqueness Decision:**
+
+| Scenario | Set Unique? | Rationale |
+|----------|-------------|-----------|
+| 1:1 key link between systems (one external record maps to one Salesforce record) | **Yes** | Prevents accidental duplicate creation and enforces data integrity across systems |
+| Logical duplicates exist (multiple Salesforce records can share the same external key) | **No** | Examples: a shared parent account ID used across child records, or a campaign code applied to multiple leads |
+
+**Best practice:** Always confirm whether the field should be marked as unique during the design phase. Ask: *"Will there ever be more than one Salesforce record with the same value in this field?"* If the answer is no, set it to unique. If yes (or uncertain), leave it non-unique and document the reasoning in the field description.
 
 > See [STD-003: Data Migration](./data-migration.md) Section 4.2 for External ID strategy.
 > See [STD-008: Integration Patterns](./integration-patterns.md) for integration-specific guidance.
